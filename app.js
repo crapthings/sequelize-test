@@ -4,6 +4,12 @@ var path = require('path'),
 	express = require('express'),
 	app = express();
 
+//
+
+app.set('view engine', 'ejs');
+
+//
+
 var Sequelize = require('sequelize');
 
 // db名test、空用户名和密码，不pass那两个参数会报错。
@@ -47,25 +53,37 @@ var Post = sequelize.define('post', {
 
 // drop db 创建表和内容
 
-sequelize.sync({ force: true }).then(function() {
-	return Author.create({
-		name: 'demo'
-	});
-}).then(function(author) {
-	return Post.create({
-		title: 'this is a title',
-		content: 'this is post content.',
-		authorId: author.id
-	});
-}).then(function(post) {
-	console.log(post.get());
-});
+sequelize.sync();
+
+// .then(function() {
+// 	return Author.create({
+// 		name: 'demo'
+// 	});
+// }).then(function(author) {
+// 	return Post.create({
+// 		title: 'this is a title',
+// 		content: 'this is post content.',
+// 		authorId: author.id
+// 	});
+// }).then(function(post) {
+// 	console.log(post.get());
+// });
 
 //
 
 app.get('/', function(req, res) {
 	Author.findAll().then(function(authors) {
-		res.send(authors);
+		res.render('pages/index', {
+			authors: authors
+		});
+	});
+});
+
+app.get('/authors/new/:name', function(req, res, next) {
+	Author.create({
+		name: req.params.name
+	}).then(function() {
+		next();
 	});
 });
 
