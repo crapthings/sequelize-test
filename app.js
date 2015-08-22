@@ -2,11 +2,16 @@
 
 var path = require('path'),
 	express = require('express'),
-	app = express();
+	app = express(),
+	bodyParser = require('body-parser');
 
 //
 
 app.set('view engine', 'ejs');
+
+//
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //
 
@@ -79,11 +84,20 @@ app.get('/', function(req, res) {
 	});
 });
 
-app.get('/authors/new/:name', function(req, res, next) {
-	Author.create({
+//
+
+app.post('/authors/new', function(req, res, next) {
+	Author.create(req.body).then(function(author) {
+		console.log(author);
+		res.redirect('/');
+	});
+});
+
+//
+
+app.get('/:name', function(req, res) {
+	res.render('pages/author', {
 		name: req.params.name
-	}).then(function() {
-		next();
 	});
 });
 
